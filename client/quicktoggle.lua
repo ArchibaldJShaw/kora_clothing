@@ -257,7 +257,7 @@ function QuickToggle.run(word)
         end
     end)
     busy = false
-    if not ok then print(('[kora_clothing] quick toggle failed: %s'):format(tostring(err))) end
+    if not ok then Kora.logging.error('quicktoggle.failed', 'Quick toggle failed', { error = tostring(err) }) end
 end
 
 local registeredCommand
