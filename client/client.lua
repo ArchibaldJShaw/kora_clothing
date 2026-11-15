@@ -1928,7 +1928,7 @@ local function spawnTattooPed(index, artist)
         x = coords.x, y = coords.y, z = coords.z - 1.0, heading = tonumber(coords.w) or 0.0,
     }, { preset = 'static' })
     if not ped then
-        print(('[kora_clothing] tattoo artist model %s could not be spawned'):format(tostring(artist.model)))
+        Kora.logging.error('tattoo.artist_spawn_failed', 'Tattoo artist model could not be spawned', { model = tostring(artist.model) })
         return
     end
     -- The player may have left, or the option been changed, while the model streamed.
@@ -1978,7 +1978,7 @@ local function registerTattooArtist(index, shop)
             CreateThread(function()
                 local ok, err = pcall(spawnTattooPed, index, artist)
                 artist.spawning = false
-                if not ok then print(('[kora_clothing] tattoo artist could not be spawned: %s'):format(tostring(err))) end
+                if not ok then Kora.logging.error('tattoo.artist_spawn_failed', 'Tattoo artist could not be spawned', { error = tostring(err) }) end
             end)
         end,
         onExit = function()

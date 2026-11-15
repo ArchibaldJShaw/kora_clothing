@@ -487,7 +487,7 @@ if Config.clothingAsItem then
     CreateThread(function()
         local coreReady = Kora.resources.awaitStarted('kora_core', { timeout = 30000, interval = 200 })
         if not coreReady then
-            print('^1[kora_clothing]^7 Config.clothingAsItem is on but kora_core did not start in time.')
+            Kora.logging.error('item.core_unavailable', 'Config.clothingAsItem is on but kora_core did not start in time')
             return
         end
         local itemOk = pcall(function()
@@ -504,19 +504,19 @@ if Config.clothingAsItem then
             })
         end)
         if not itemOk then
-            print('^1[kora_clothing]^7 Config.clothingAsItem is on but registering the outfit item with kora_core failed.')
+            Kora.logging.error('item.register_failed', 'Config.clothingAsItem is on but registering the outfit item with kora_core failed')
         end
 
         local inventoryReady = Kora.resources.awaitStarted('kora_inventory', { timeout = 30000, interval = 200 })
         if not inventoryReady then
-            print('^1[kora_clothing]^7 Config.clothingAsItem is on but kora_inventory did not start in time.')
+            Kora.logging.error('item.inventory_unavailable', 'Config.clothingAsItem is on but kora_inventory did not start in time')
             return
         end
         local useableOk = pcall(function()
             exports.kora_inventory:createUseable(Config.clothingItem.name, equipFromItem)
         end)
         if not useableOk then
-            print('^1[kora_clothing]^7 Config.clothingAsItem is on but kora_inventory:createUseable failed -- is kora_inventory running?')
+            Kora.logging.error('item.useable_failed', 'Config.clothingAsItem is on but kora_inventory:createUseable failed; is kora_inventory running?')
         end
     end)
 end

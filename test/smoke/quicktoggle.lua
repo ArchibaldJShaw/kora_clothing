@@ -8,7 +8,11 @@ _G.RegisterCommand = function(name, fn) commands[name] = fn end
 _G.AddEventHandler = function() end
 _G.TriggerEvent = function(name, ...) if name == 'chat:addSuggestion' then suggestions[#suggestions + 1] = { ... } end end
 _G.GetCurrentResourceName = function() return 'kora_clothing' end
-_G.Kora = { notify = { send = function(p) messages[#messages + 1] = p end } }
+local logged = {}
+_G.Kora = {
+    notify = { send = function(p) messages[#messages + 1] = p end },
+    logging = { error = function(event, message, fields) logged[#logged + 1] = { level = 'error', event = event, message = message, fields = fields } end },
+}
 _G.joaat = function(v) return v end
 _G.vector4 = function(x, y, z, w) return { x = x, y = y, z = z, w = w } end
 _G.vector3 = function(x, y, z) return { x = x, y = y, z = z } end
@@ -134,6 +138,17 @@ Config.quickToggle.animations = false; anims = 0; use('hat'); H.equal(anims, 0, 
 
 -- fitting room session forgets memory
 use('vest'); QuickToggle.forget(); dress(); use('vest'); H.equal(comps[9].d, 0, 'forgotten memory: fresh removal')
+
+-- a failing toggle is reported through Kora.logging.error with the error in fields
+dress(); logged = {}
+local realSetComponent = _G.SetPedComponentVariation
+_G.SetPedComponentVariation = function() error('anim exploded') end
+use('vest')
+_G.SetPedComponentVariation = realSetComponent
+H.equal(#logged, 1, 'one logger call for the failed toggle')
+H.equal(logged[1].level, 'error', 'logged at error level')
+H.equal(logged[1].event, 'quicktoggle.failed', 'stable event name')
+H.ok(tostring(logged[1].fields.error):find('anim exploded', 1, true), 'error carried in fields')
 
 -- disabled feature registers nothing
 commands = {}; suggestions = {}
